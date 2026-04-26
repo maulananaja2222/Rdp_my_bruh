@@ -1,0 +1,19 @@
+name: Gas-RDP
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Setup Koneksi
+        run: |
+          Invoke-WebRequest https://bin.equinox.io/c/b3275492-748a-4933-9097-f58c7075c742/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip
+          .\ngrok.exe config add-authtoken 39KdAqohmcQLUbquXDM3z9XkkoO_4h4K9SVX1Zfq57miRtN8
+          Start-Process .\ngrok.exe -ArgumentList "tcp 3389"
+      - name: Aktifkan Windows RDP
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+      - name: Tunggu Koneksi (6 Jam)
+        run: Start-Sleep -Seconds 21600
+        
